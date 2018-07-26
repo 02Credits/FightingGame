@@ -23,6 +23,10 @@ namespace FightingGame.Systems
             var sprite = entity.GetComponent<Sprite>();
             var textured = entity.GetComponent<Textured>();
             sprite.CurrentFrame = frameCount / 5 % textured.FrameCount;
+
+            var position = entity.GetComponent<Position>();
+            position.Value = new Vector2(0.0f, 100.0f * (float)Math.Cos(frameCount / 500.0));
+
             frameCount++;
         }
     }

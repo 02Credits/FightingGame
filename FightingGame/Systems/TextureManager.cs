@@ -33,10 +33,7 @@ namespace FightingGame.Systems
 
         public void Initialize(Entity entity)
         {
-            var texturedComponent = entity.GetComponent<Textured>();
-            var texture = LoadTexturesIfNeeded(texturedComponent.Path);
-            texturedComponent.Width = texture.Width;
-            texturedComponent.Height = texture.Height;
+            LoadTexturesIfNeeded(entity.GetComponent<Textured>().Path);
         }
 
         private Texture2D LoadTexturesIfNeeded(string path)

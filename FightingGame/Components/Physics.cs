@@ -12,7 +12,7 @@ namespace FightingGame.Components
         {
             typeof(Position),
             typeof(Velocity),
-            typeof(Textured)
+            typeof(Sprite)
         };
         public override List<Type> RequiredComponents { get { return requiredComponents; } }
 

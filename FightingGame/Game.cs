@@ -18,11 +18,24 @@ namespace FightingGame
         public static void InitialEntities()
         {
             new Entity(
+                new ColorTint { Color = Color.White },
                 new Textured { Path = "Idle", FrameCount = 7 },
                 new Position { Value = new Vector2(0, 0) },
+                new Velocity(),
+                new Sprite(),
+                new Physics { PhysicsPath = "Idle" },
+                new CameraTarget()
+            );
+
+            new Entity(
+                new ColorTint { Color = Color.White },
+                new Textured { Path = "Idle", FrameCount = 7 },
+                new Position { Value = new Vector2(0, 0) },
+                new Velocity(),
+                new Sprite(),
+                new Physics { PhysicsPath = "Idle" },
                 new CameraTarget(),
-                new Player { },
-                new Sprite()
+                new Player()
             );
         }
 
@@ -66,6 +79,7 @@ namespace FightingGame
             AddSystem(new PlayerManager());
             AddSystem(new VertexRenderer(graphics.GraphicsDevice));
             AddSystem(new VertexManager());
+            AddSystem(new PhysicsManager());
 
             InitializeSystems();
             InitialEntities();
@@ -108,9 +122,21 @@ namespace FightingGame
             base.LoadContent();
         }
 
+        int _frames = 0;
+        int _fpsTime = 0;
+
         protected override void Update(GameTime gameTime)
         {
             Time += (gameTime.ElapsedGameTime.Milliseconds / 1000f);
+
+            _fpsTime += gameTime.ElapsedGameTime.Milliseconds;
+            if (_fpsTime >= 1000)
+            {
+                Window.Title = _frames.ToString();
+                _frames = 0;
+                _fpsTime = 0;
+            }
+
             foreach (var system in UpdatedSystems)
             {
                 system.Update();
@@ -136,6 +162,8 @@ namespace FightingGame
 
         protected override void Draw(GameTime gameTime)
         {
+            _frames++;
+
             GraphicsDevice.Clear(Color.Black);
 
             foreach (var system in DrawnSystems)
