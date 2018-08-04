@@ -1,4 +1,4 @@
-﻿using FightingGame.Interfaces;
+﻿using FightingGame.Systems.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -29,7 +29,7 @@ namespace FightingGame.Systems
             basicEffect.VertexColorEnabled = true;
             basicEffect.TextureEnabled = true;
 
-            basicEffect.World = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.UnitY);
+            basicEffect.World = Matrix.CreateWorld(Vector3.Zero, Vector3.Negate(Vector3.UnitZ), Vector3.UnitY);
 
             var cameraManager = Game.GetSystem<CameraManager>();
             basicEffect.View = cameraManager.View;

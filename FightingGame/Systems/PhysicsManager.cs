@@ -1,5 +1,4 @@
-﻿using FightingGame.Components;
-using FightingGame.Interfaces;
+﻿using FightingGame.Systems.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -10,53 +9,62 @@ using System.Threading.Tasks;
 
 namespace FightingGame.Systems
 {
+    public struct Velocity
+    {
+        public Vector2 Value { get; set; }
+    }
+
+    public struct Physics
+    {
+        public SpriteSheet PhysicsSheet { get; set; }
+        public bool Static { get; set; }
+    }
+
     public class PhysicsManager : IUpdatedSystem
     {
         public void Update()
         {
-            foreach (var entity1 in Game.Entities.Where(entity => entity.HasComponent<Physics>()))
+            foreach (var entity1 in Game.Entities.Where(entity => entity.Has<Physics>()))
             {
-                var entity1Position = entity1.GetComponent<Position>().Value;
-                var entity1Textured = entity1.GetComponent<Textured>();
-                var entity1Sprite = entity1.GetComponent<Sprite>();
-                foreach (var entity2 in Game.Entities.Where(entity => entity.HasComponent<Physics>()))
+                var entity1Position = entity1.Get<Position>().Value;
+                var entity1SpriteSheet = entity1.Get<SpriteSheet>();
+                var entity1Animated = entity1.Get<Animated>();
+                foreach (var entity2 in Game.Entities.Where(entity => entity.Has<Physics>()))
                 {
                     if (entity2 != entity1)
                     {
-                        var entity2Position = entity2.GetComponent<Position>().Value;
-                        var entity2Textured = entity2.GetComponent<Textured>();
-                        var entity2Sprite = entity2.GetComponent<Sprite>();
+                        var entity2Position = entity2.Get<Position>().Value;
+                        var entity2SpriteSheet = entity2.Get<SpriteSheet>();
+                        var entity2Animated = entity2.Get<Animated>();
 
-                        if (Collision(entity1Sprite, entity1Position, entity1Textured, entity2Sprite, entity2Position, entity2Textured))
+                        if (Collision(entity1SpriteSheet, entity1Animated.CurrentFrame, entity1Position,
+                                      entity2SpriteSheet, entity2Animated.CurrentFrame, entity2Position))
                         {
-                            if (entity1.TryGetComponent<ColorTint>(out var colorTint))
-                            {
-                                colorTint.Color = Color.Red;
-                            }
+                            //entity1.Set(new ColorTint { Color = Color.Red });
                         }
                         else
                         {
-                            if (entity1.TryGetComponent<ColorTint>(out var colorTint))
-                            {
-                                colorTint.Color = Color.White;
-                            }
+                            //entity1.Set(new ColorTint { Color = Color.White });
                         }
                     }
                 }
             }
         }
 
-        public bool Collision(Sprite sprite1, Vector2 position1, Textured textured1, Sprite sprite2, Vector2 position2, Textured textured2)
+        public bool Collision(SpriteSheet spriteSheet1, int currentFrame1, Vector2 position1, 
+                              SpriteSheet spriteSheet2, int currentFrame2, Vector2 position2)
         {
-            Texture2D texture1 = textured1.Texture;
-            Texture2D texture2 = textured2.Texture;
+            Texture2D texture1 = spriteSheet1.Texture;
+            Texture2D texture2 = spriteSheet2.Texture;
+            int frameWidth1 = texture1.Width / spriteSheet1.FrameCount;
+            int frameWidth2 = texture2.Width / spriteSheet2.FrameCount;
             int minX = (int)Math.Max(position1.X, position2.X);
-            int maxX = (int)Math.Min(position1.X + textured1.FrameWidth, position2.X + textured2.FrameWidth);
+            int maxX = (int)Math.Min(position1.X + frameWidth1, position2.X + frameWidth2);
             int minY = (int)Math.Max(position1.Y, position2.Y);
             int maxY = (int)Math.Min(position1.Y + texture1.Height, position2.Y + texture2.Height);
 
-            int xOffset1 = sprite1.CurrentFrame * textured1.FrameWidth;
-            int xOffset2 = sprite2.CurrentFrame * textured2.FrameWidth;
+            int xOffset1 = currentFrame1 * frameWidth1;
+            int xOffset2 = currentFrame2 * frameWidth2;
 
             if (minX < maxX && minY < maxY)
             {

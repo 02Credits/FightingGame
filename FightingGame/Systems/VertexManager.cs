@@ -1,4 +1,4 @@
-﻿using FightingGame.Interfaces;
+﻿using FightingGame.Systems.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

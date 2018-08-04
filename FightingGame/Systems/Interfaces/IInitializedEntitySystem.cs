@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FightingGame.Interfaces
+namespace FightingGame.Systems.Interfaces
 {
-    public interface IUpdatedEntitySystem
+    public interface IInitializedEntitySystem
     {
         List<Type> SubscribedComponentTypes { get; }
-        void Update(Entity entity);
+        void Initialize(Entity entity);
     }
 }

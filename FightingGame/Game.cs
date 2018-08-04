@@ -6,44 +6,147 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using FightingGame.Interfaces;
+using FightingGame.Systems.Interfaces;
 using FightingGame.Systems;
-using FightingGame.Components;
+using FightingGame.Networking;
+using System.Windows.Forms;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 #endregion
 
 namespace FightingGame
 {
+    public enum Screen
+    {
+        Menu,
+        Connecting,
+        Waiting,
+        Playing
+    }
+
     public class Game : Microsoft.Xna.Framework.Game
     {
-        public static void InitialEntities()
+        public const int BufferSize = 100;
+        public const int ScreenWidth = 600;
+        public const double ScreenAspectRatio = 9.0 / 16.0;
+        public const int ScreenScale = 2;
+
+        public static Screen CurrentScreen { get; private set; }
+        public static int Frame { get; private set; }
+        public static bool Rewinding { get; private set; }
+
+        public static void Start()
         {
-            new Entity(
-                new ColorTint { Color = Color.White },
-                new Textured { Path = "Idle", FrameCount = 7 },
-                new Position { Value = new Vector2(0, 0) },
-                new Velocity(),
-                new Sprite(),
-                new Physics { PhysicsPath = "Idle" },
-                new CameraTarget()
+            Clear();
+            CurrentScreen = Screen.Menu;
+            var hostFocusedSheet = new SpriteSheet { Path = "HostFocused" };
+            var hostUnfocusedSheet = new SpriteSheet { Path = "HostUnfocused" };
+            var hostButton = new Entity(
+                new Position { Value = new Vector2(-ScreenWidth / 4, 0) },
+                hostFocusedSheet,
+                new Focusable
+                {
+                    FocusedSheet = hostFocusedSheet,
+                    UnfocusedSheet = hostUnfocusedSheet,
+                    Focused = true,
+                    NextEntities = new Dictionary<Keys, Entity>(),
+                    Activate = WaitingForConnection
+                }
             );
 
-            new Entity(
-                new ColorTint { Color = Color.White },
-                new Textured { Path = "Idle", FrameCount = 7 },
-                new Position { Value = new Vector2(0, 0) },
-                new Velocity(),
-                new Sprite(),
-                new Physics { PhysicsPath = "Idle" },
-                new CameraTarget(),
-                new Player()
+            var joinFocusedSheet = new SpriteSheet { Path = "JoinFocused" };
+            var joinUnfocusedSheet = new SpriteSheet { Path = "JoinUnfocused" };
+            var joinButton = new Entity(
+                new Position { Value = new Vector2(ScreenWidth / 4, 0) },
+                joinUnfocusedSheet,
+                new Focusable
+                {
+                    FocusedSheet = joinFocusedSheet,
+                    UnfocusedSheet = joinUnfocusedSheet,
+                    Focused = false,
+                    NextEntities = new Dictionary<Keys, Entity>(),
+                    Activate = Connecting
+                }
             );
+
+            var hostNext = hostButton.Get<Focusable>().NextEntities;
+            hostNext[Keys.Tab] = joinButton;
+            hostNext[Keys.Right] = joinButton;
+            var joinNext = joinButton.Get<Focusable>().NextEntities;
+            joinNext[Keys.Tab] = hostButton;
+            joinNext[Keys.Left] = hostButton;
+        }
+
+        public static void Connecting()
+        {
+            Form prompt = new Form()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = "Host Address",
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            Label textLabel = new Label() { Left = 50, Top=20, Text="Host Address" };
+            TextBox textBox = new TextBox() { Left = 50, Top=50, Width=400 };
+            Button confirmation = new Button() { Text = "Ok", Left=350, Width=100, Top=70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+            var hostAddress = prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+
+            Clear();
+            CurrentScreen = Screen.Connecting;
+            GetSystem<NetworkManager>().Connect(hostAddress, 8080);
+            new Entity(
+                new SpriteSheet { Path = "Connecting" },
+                new Position { Value = new Vector2(0, 0) },
+                new CameraTarget()
+            );
+        }
+
+        public static void WaitingForConnection()
+        {
+            Clear();
+            CurrentScreen = Screen.Waiting;
+            GetSystem<NetworkManager>().Host();
+            new Entity(
+                new SpriteSheet { Path = "WaitingForConnection" },
+                new Position { Value = new Vector2(0, 0) },
+                new CameraTarget()
+            );
+        }
+
+        public static void Play()
+        {
+            Clear();
+            CurrentScreen = Screen.Playing;
+        }
+
+        protected override void Initialize()
+        {
+            AddSystem(new NetworkManager());
+            AddSystem(new InputManager(this));
+            AddSystem(new AnimationManager());
+            AddSystem(new TextureManager(Content, graphics.GraphicsDevice));
+            AddSystem(new SpriteRenderer());
+            AddSystem(new CameraManager());
+            AddSystem(new PlayerManager());
+            AddSystem(new VertexRenderer(graphics.GraphicsDevice));
+            AddSystem(new VertexManager());
+            AddSystem(new PhysicsManager());
+            AddSystem(new UIManager());
+
+            InitializeSystems();
+
+            Start();
+
+            base.Initialize();
         }
 
         #region BoilerPlate
         GraphicsDeviceManager graphics;
-
-        public static Random Random { get; set; }
-        public static float Time { get; set; }
 
         public static readonly List<Entity> Entities = new List<Entity>();
         public static readonly Dictionary<Type, object> Systems = new Dictionary<Type, object>();
@@ -62,29 +165,11 @@ namespace FightingGame
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-            var scale = 2;
-            var width = 600;
-            graphics.PreferredBackBufferWidth = width * scale;
-            graphics.PreferredBackBufferHeight = width * scale * 9 / 16;
-            Random = new Random();
-            Time = 0;
+            graphics.PreferredBackBufferWidth = ScreenWidth * ScreenScale;
+            graphics.PreferredBackBufferHeight = (int)(ScreenWidth * ScreenScale * ScreenAspectRatio);
             Content.RootDirectory = @"Content/bin";
-        }
-
-        protected override void Initialize()
-        {
-            AddSystem(new TextureManager(Content, graphics.GraphicsDevice));
-            AddSystem(new SpriteRenderer());
-            AddSystem(new CameraManager(graphics.GraphicsDevice));
-            AddSystem(new PlayerManager());
-            AddSystem(new VertexRenderer(graphics.GraphicsDevice));
-            AddSystem(new VertexManager());
-            AddSystem(new PhysicsManager());
-
-            InitializeSystems();
-            InitialEntities();
-
-            base.Initialize();
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60.0f);
+            IsFixedTimeStep = true;
         }
         #endregion
 
@@ -110,7 +195,7 @@ namespace FightingGame
                 {
                     foreach (var subscribedComponent in system.SubscribedComponentTypes)
                     {
-                        if (gameObject.Components.ContainsKey(subscribedComponent))
+                        if (gameObject.Has(subscribedComponent))
                         {
                             system.Load(gameObject);
                             break;
@@ -124,17 +209,17 @@ namespace FightingGame
 
         int _frames = 0;
         int _fpsTime = 0;
-
         protected override void Update(GameTime gameTime)
         {
-            Time += (gameTime.ElapsedGameTime.Milliseconds / 1000f);
-
-            _fpsTime += gameTime.ElapsedGameTime.Milliseconds;
-            if (_fpsTime >= 1000)
+            if (gameTime != null)
             {
-                Window.Title = _frames.ToString();
-                _frames = 0;
-                _fpsTime = 0;
+                _fpsTime += gameTime.ElapsedGameTime.Milliseconds;
+                if (_fpsTime >= 1000)
+                {
+                    Window.Title = _frames.ToString();
+                    _frames = 0;
+                    _fpsTime = 0;
+                }
             }
 
             foreach (var system in UpdatedSystems)
@@ -148,7 +233,7 @@ namespace FightingGame
                 {
                     foreach (var subscribedComponent in system.SubscribedComponentTypes)
                     {
-                        if (gameObject.Components.ContainsKey(subscribedComponent))
+                        if (gameObject.Has(subscribedComponent))
                         {
                             system.Update(gameObject);
                             break;
@@ -157,6 +242,12 @@ namespace FightingGame
                 }
             }
 
+            foreach (var entity in Entities)
+            {
+                entity.Tick();
+            }
+
+            Frame++;
             base.Update(gameTime);
         }
 
@@ -177,7 +268,7 @@ namespace FightingGame
                 {
                     foreach (var subscribedComponent in system.SubscribedComponentTypes)
                     {
-                        if (gameObject.Components.ContainsKey(subscribedComponent))
+                        if (gameObject.Has(subscribedComponent))
                         {
                             system.Draw(gameObject);
                             break;
@@ -202,7 +293,7 @@ namespace FightingGame
                 {
                     foreach (var subscribedComponent in system.SubscribedComponentTypes)
                     {
-                        if (gameObject.Components.ContainsKey(subscribedComponent))
+                        if (gameObject.Has(subscribedComponent))
                         {
                             system.Unload(gameObject);
                             break;
@@ -301,6 +392,38 @@ namespace FightingGame
         #endregion
 
         #region EntityManagement
+        public void ResimulateFrom(int frame)
+        {
+            int rewindAmount = Frame - frame;
+
+            foreach (Entity entity in Entities)
+            {
+                entity.Rewind(rewindAmount);
+            }
+
+            Frame = frame;
+
+            Rewinding = true;
+            for (int i = 0; i < rewindAmount; i++)
+            {
+                Update(null);
+            }
+            Rewinding = false;
+        }
+
+        public static void Clear()
+        {
+            foreach (var entity in Entities.ToList())
+            {
+                RemoveEntity(entity);
+            }
+            AddEntity(new Entity(
+                new Position { Value = Vector2.Zero },
+                new Camera()));
+            Frame = 1;
+            GetSystem<InputManager>().ClearHistory();
+        }
+
         public static void AddEntity(Entity entity)
         {
             Entities.Add(entity);
@@ -309,7 +432,7 @@ namespace FightingGame
             {
                 foreach (var subscribedComponent in system.SubscribedComponentTypes)
                 {
-                    if (entity.Components.ContainsKey(subscribedComponent))
+                    if (entity.Has(subscribedComponent))
                     {
                         system.Initialize(entity);
                         break;
@@ -341,7 +464,7 @@ namespace FightingGame
             {
                 foreach (var subscribedComponent in system.SubscribedComponentTypes)
                 {
-                    if (entity.Components.ContainsKey(subscribedComponent))
+                    if (entity.Has(subscribedComponent))
                     {
                         system.Deconstruct(entity);
                         break;

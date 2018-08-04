@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FightingGame.Interfaces
+namespace FightingGame.Systems.Interfaces
 {
-    public interface IInitializedSystem
+    public interface ILoadedSystem
     {
-        void Initialize();
+        void Load();
     }
 }

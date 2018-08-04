@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FightingGame.Interfaces
+namespace FightingGame.Systems.Interfaces
 {
-    public interface IDeconstructedEntitySystem
+    public interface IUnloadedEntitySystem
     {
         List<Type> SubscribedComponentTypes { get; }
-        void Deconstruct(Entity entity);
+        void Unload(Entity entity);
     }
 }

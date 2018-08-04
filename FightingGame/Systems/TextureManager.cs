@@ -1,5 +1,4 @@
-﻿using FightingGame.Components;
-using FightingGame.Interfaces;
+﻿using FightingGame.Systems.Interfaces;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -14,8 +13,9 @@ namespace FightingGame.Systems
     {
         static List<Type> subscribedComponentTypes = new List<Type>
         {
-            typeof(Textured),
-            typeof(Physics)
+            typeof(SpriteSheet),
+            typeof(Physics),
+            typeof(Focusable)
         };
         public List<Type> SubscribedComponentTypes { get { return subscribedComponentTypes; } }
 
@@ -33,20 +33,34 @@ namespace FightingGame.Systems
 
         public void Initialize(Entity entity)
         {
-            LoadTexturesIfNeeded(entity.GetComponent<Textured>().Path);
+            if (entity.TryGet<SpriteSheet>(out var spriteSheet))
+            {
+                LoadTexturesIfNeeded(spriteSheet);
+            }
+
+            if (entity.TryGet<Physics>(out var physicsComponent))
+            {
+                LoadTexturesIfNeeded(physicsComponent.PhysicsSheet);
+            }
+
+            if (entity.TryGet<Focusable>(out var focusableComponent))
+            {
+                LoadTexturesIfNeeded(focusableComponent.FocusedSheet);
+                LoadTexturesIfNeeded(focusableComponent.UnfocusedSheet);
+            }
         }
 
-        private Texture2D LoadTexturesIfNeeded(string path)
+        private Texture2D LoadTexturesIfNeeded(SpriteSheet sheet)
         {
             Texture2D texture;
-            if (!Textures.ContainsKey(path))
+            if (!Textures.ContainsKey(sheet.Path))
             {
-                texture = contentManager.Load<Texture2D>(path);
-                Textures[path] = texture;
+                texture = contentManager.Load<Texture2D>(sheet.Path);
+                Textures[sheet.Path] = texture;
             }
             else
             {
-                texture = Textures[path];
+                texture = Textures[sheet.Path];
             }
             return texture;
         }
