@@ -11,6 +11,8 @@ using FightingGame.Systems;
 using FightingGame.Networking;
 using System.Windows.Forms;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Serilog;
+using Serilog.Core;
 #endregion
 
 namespace FightingGame
@@ -36,6 +38,7 @@ namespace FightingGame
 
         public static void Start()
         {
+            levelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
             Clear();
             CurrentScreen = Screen.Menu;
             var hostFocusedSheet = new SpriteSheet { Path = "HostFocused" };
@@ -162,6 +165,8 @@ namespace FightingGame
         public static readonly List<IUnloadedEntitySystem> UnloadedEntitySystems = new List<IUnloadedEntitySystem>();
         public static readonly List<IDeconstructedEntitySystem> DeconstructedEntitySystems = new List<IDeconstructedEntitySystem>();
 
+        private static LoggingLevelSwitch levelSwitch;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -170,6 +175,13 @@ namespace FightingGame
             Content.RootDirectory = @"Content/bin";
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60.0f);
             IsFixedTimeStep = true;
+
+            levelSwitch = new LoggingLevelSwitch(Serilog.Events.LogEventLevel.Error);
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.ControlledBy(levelSwitch)
+                .WriteTo.File("c:/dev/FG" + Guid.NewGuid().ToString() + ".log")
+                .CreateLogger();
         }
         #endregion
 
@@ -211,6 +223,9 @@ namespace FightingGame
         int _fpsTime = 0;
         protected override void Update(GameTime gameTime)
         {
+            Frame++;
+            Log.Information("Frame {FrameNumber}", Frame);
+
             if (gameTime != null)
             {
                 _fpsTime += gameTime.ElapsedGameTime.Milliseconds;
@@ -247,7 +262,6 @@ namespace FightingGame
                 entity.Tick();
             }
 
-            Frame++;
             base.Update(gameTime);
         }
 
@@ -395,6 +409,8 @@ namespace FightingGame
         public void ResimulateFrom(int frame)
         {
             int rewindAmount = Frame - frame;
+
+            Log.Information("Rewound {n} frames", rewindAmount);
 
             foreach (Entity entity in Entities)
             {

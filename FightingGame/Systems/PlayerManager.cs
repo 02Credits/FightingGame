@@ -2,6 +2,7 @@
 using FightingGame.Systems.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace FightingGame.Systems
 
             if (inputStates.TryGetValue(playerId, out var inputState))
             {
+                Log.Information("Player moved.");
                 if ((inputState.Left & KeyStatus.Down) != KeyStatus.None)
                 {
                     entity.Set(Run);
