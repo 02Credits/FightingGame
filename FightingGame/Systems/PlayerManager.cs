@@ -83,7 +83,7 @@ namespace FightingGame.Systems
                                 new Position { Value = Vector2.Zero },
                                 new Player { PlayerId = playerId },
                                 Idle,
-                                new Animated { AnimationSpeed = 10, Flipped = false }
+                                new Animated { AnimationSpeed = 6, Flipped = false }
                             ));
                         }
                     }

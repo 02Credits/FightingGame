@@ -408,7 +408,7 @@ namespace FightingGame
         #region EntityManagement
         public void ResimulateFrom(int frame)
         {
-            int rewindAmount = Frame - frame;
+            int rewindAmount = Frame - 1 - frame;
 
             Log.Information("Rewound {n} frames", rewindAmount);
 
