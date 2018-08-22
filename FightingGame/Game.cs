@@ -129,7 +129,7 @@ namespace FightingGame
             AddSystem(new NetworkManager());
             AddSystem(new InputManager(this));
             AddSystem(new AnimationManager());
-            AddSystem(new TextureManager(Content, graphics.GraphicsDevice));
+            AddSystem(new TextureManager(graphics.GraphicsDevice));
             AddSystem(new SpriteRenderer());
             AddSystem(new CameraManager());
             AddSystem(new PlayerManager());
@@ -169,7 +169,6 @@ namespace FightingGame
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = ScreenWidth * ScreenScale;
             graphics.PreferredBackBufferHeight = (int)(ScreenWidth * ScreenScale * ScreenAspectRatio);
-            Content.RootDirectory = @"Content/bin";
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60.0f);
             IsFixedTimeStep = true;
 

@@ -20,14 +20,12 @@ namespace FightingGame.Systems
         public List<Type> SubscribedComponentTypes { get { return subscribedComponentTypes; } }
 
         public Dictionary<string, Texture2D> Textures { get; private set; }
-        private ContentManager contentManager;
         private GraphicsDevice graphics;
 
-        public TextureManager(ContentManager contentManager, GraphicsDevice graphics)
+        public TextureManager(GraphicsDevice graphics)
         {
             Textures = new Dictionary<string, Texture2D>();
 
-            this.contentManager = contentManager;
             this.graphics = graphics;
         }
 
@@ -55,7 +53,11 @@ namespace FightingGame.Systems
             Texture2D texture;
             if (!Textures.ContainsKey(sheet.Path))
             {
-                texture = contentManager.Load<Texture2D>(sheet.Path);
+                using (var fileStream = new FileStream("Content/" + sheet.Path + ".png", FileMode.Open))
+                {
+                    texture = Texture2D.FromStream(graphics, fileStream);
+                }
+
                 Textures[sheet.Path] = texture;
             }
             else
