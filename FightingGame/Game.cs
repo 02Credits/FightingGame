@@ -1,19 +1,16 @@
-﻿#region Using Statements
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using FightingGame.Systems.Interfaces;
 using FightingGame.Systems;
-using FightingGame.Networking;
 using System.Windows.Forms;
-using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Serilog;
 using Serilog.Core;
-#endregion
+using System.IO;
+
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace FightingGame
 {
@@ -38,7 +35,6 @@ namespace FightingGame
 
         public static void Start()
         {
-            levelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
             Clear();
             CurrentScreen = Screen.Menu;
             var hostFocusedSheet = new SpriteSheet { Path = "HostFocused" };
@@ -123,6 +119,7 @@ namespace FightingGame
 
         public static void Play()
         {
+            levelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
             Clear();
             CurrentScreen = Screen.Playing;
         }
@@ -176,11 +173,22 @@ namespace FightingGame
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60.0f);
             IsFixedTimeStep = true;
 
+            int logNumber = 1;
+
+            var logDirectory = "c:/dev/FG/";
+            if (!Directory.Exists(logDirectory)) Directory.CreateDirectory(logDirectory);
+            var logFiles = Directory.GetFiles(logDirectory);
+            var logNumbers = logFiles.Select(file => Int32.Parse(file.Substring(10).TrimEnd('.', 'l', 'o', 'g')));
+            if (logNumbers.Any())
+            {
+                logNumber = logNumbers.Max() + 1;
+            }
+
             levelSwitch = new LoggingLevelSwitch(Serilog.Events.LogEventLevel.Error);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
-                .WriteTo.File("c:/dev/FG" + Guid.NewGuid().ToString() + ".log")
+                .WriteTo.File(logDirectory + logNumber + ".log")
                 .CreateLogger();
         }
         #endregion

@@ -35,7 +35,6 @@ namespace FightingGame.Systems
 
             if (inputStates.TryGetValue(playerId, out var inputState))
             {
-                Log.Information("Player moved.");
                 if ((inputState.Left & KeyStatus.Down) != KeyStatus.None)
                 {
                     entity.Set(Run);
@@ -63,6 +62,9 @@ namespace FightingGame.Systems
                     entity.Set(Idle);
                 }
             }
+
+            var x = entity.Get<Position>().Value.X;
+            Log.Information("id: {id}, x: {x}", playerId, x);
         }
 
         public void Update()
