@@ -1,16 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\PropertyChanged.Fody.2.6.0\build\PropertyChanged.Fody.props" Condition="Exists('..\packages\PropertyChanged.Fody.2.6.0\build\PropertyChanged.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{94364736-CA05-4216-930D-BDD790EB1B7E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>FightingGame</RootNamespace>
     <AssemblyName>FightingGame</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -34,88 +38,229 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.9.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.9.0-beta1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Caliburn.Micro.Core.4.0.0-alpha.1\lib\netstandard1.0\Caliburn.Micro.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro.Platform, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Caliburn.Micro.4.0.0-alpha.1\lib\net45\Caliburn.Micro.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="Caliburn.Micro.Platform.Core, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Caliburn.Micro.4.0.0-alpha.1\lib\net45\Caliburn.Micro.Platform.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.1.189\lib\net45\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="MonoGame.Framework.WpfInterop, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WpfInterop.1.7.1\lib\net452\MonoGame.Framework.WpfInterop.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.2.7.2-dev-01024\lib\net46\Serilog.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog.Sinks.Console, Version=3.1.2.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.Sinks.Console.3.1.2-dev-00777\lib\net45\Serilog.Sinks.Console.dll</HintPath>
+    <Reference Include="PropertyChanged, Version=2.6.0.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropertyChanged.Fody.2.6.0\lib\net452\PropertyChanged.dll</HintPath>
     </Reference>
-    <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.Sinks.File.4.0.1-dev-00796\lib\net45\Serilog.Sinks.File.dll</HintPath>
+    <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Direct2D1.4.0.1\lib\net45\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Direct3D11.4.0.1\lib\net45\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Direct3D9.4.0.1\lib\net45\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.DXGI.4.0.1\lib\net45\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Mathematics, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.Mathematics.4.0.1\lib\net45\SharpDX.Mathematics.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.MediaFoundation.4.0.1\lib\net45\SharpDX.MediaFoundation.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XAudio2.4.0.1\lib\net45\SharpDX.XAudio2.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.XInput, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XInput.4.0.1\lib\net45\SharpDX.XInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.6.0-preview.18571.3\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Caliburn.Micro.4.0.0-alpha.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entity.cs" />
-    <Compile Include="Game.cs" />
-    <Compile Include="Networking\Methods.cs" />
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Bootstrapper.cs" />
     <Compile Include="Networking\IDManager.cs" />
-    <None Include="Networking\MessageParser.csx" />
     <Compile Include="Networking\MessageParser.cs">
       <DependentUpon>MessageParser.csx</DependentUpon>
     </Compile>
-    <Compile Include="Systems\AnimationManager.cs" />
-    <Compile Include="Systems\InputManager.cs" />
-    <Compile Include="Systems\NetworkManager.cs" />
-    <Compile Include="Networking\SerializationUtils.cs" />
-    <None Include="Networking\RemoteProxy.csx" />
+    <Compile Include="Networking\Methods.cs" />
+    <Compile Include="Networking\NetworkManagerBase.cs" />
+    <Compile Include="Networking\RemoteInputsManager.cs" />
     <Compile Include="Networking\RemoteProxy.cs">
       <DependentUpon>RemoteProxy.csx</DependentUpon>
     </Compile>
-    <Compile Include="Systems\Interfaces\IDeconstructedEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\IDrawnEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\IDrawnSystem.cs" />
-    <Compile Include="Systems\Interfaces\IInitializedEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\IInitializedSystem.cs" />
-    <Compile Include="Systems\Interfaces\ILoadedEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\ILoadedSystem.cs" />
-    <Compile Include="Systems\Interfaces\IUnloadedEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\IUnloadedSystem.cs" />
-    <Compile Include="Systems\Interfaces\IUpdatedEntitySystem.cs" />
-    <Compile Include="Systems\Interfaces\IUpdatedSystem.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Systems\CameraManager.cs" />
-    <Compile Include="Systems\PhysicsManager.cs" />
-    <Compile Include="Systems\PlayerManager.cs" />
-    <Compile Include="Systems\SpriteRenderer.cs" />
-    <Compile Include="Systems\TextureManager.cs" />
-    <Compile Include="Systems\UIManager.cs" />
-    <Compile Include="Systems\VertexManager.cs" />
-    <Compile Include="Systems\VertexRenderer.cs" />
+    <Compile Include="Networking\SerializationUtils.cs" />
+    <Compile Include="GameLogic\SystemManager.cs" />
+    <Compile Include="GameLogic\Systems\AnimationManager.cs" />
+    <Compile Include="GameLogic\Systems\CameraManager.cs" />
+    <Compile Include="GameLogic\Systems\CollisionManager.cs" />
+    <Compile Include="GameLogic\Systems\EntityManager.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IDrawableSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IEntityDrawerSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IEntityLoaderSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IEntityUnloaderSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IEntityUpdaterSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IInitializableSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\ILoadableSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\ISystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IUnloadableSystem.cs" />
+    <Compile Include="GameLogic\Systems\Interfaces\IUpdatableSystem.cs" />
+    <Compile Include="Networking\NetworkManager.cs" />
+    <Compile Include="GameLogic\Systems\PlayerManager.cs" />
+    <Compile Include="GameLogic\Systems\SpriteRenderer.cs" />
+    <Compile Include="GameLogic\Systems\SystemBase.cs" />
+    <Compile Include="GameLogic\Systems\TextureManager.cs" />
+    <Compile Include="GameLogic\Systems\VertexManager.cs" />
+    <Compile Include="GameLogic\Systems\VertexRenderer.cs" />
+    <Compile Include="GameLogic\Utils.cs" />
+    <Compile Include="GameLogic\World.cs" />
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GameLogic\Entity.cs" />
+    <Compile Include="GameLogic\Game.cs" />
+    <Compile Include="GameLogic\InputManager.cs" />
+    <Compile Include="Networking\InputState.cs" />
+    <Compile Include="ViewModels\ConnectingViewModel.cs" />
+    <Compile Include="ViewModels\LobbyViewModel.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\StartPageViewModel.cs" />
+    <Compile Include="Views\ConnectingView.xaml.cs">
+      <DependentUpon>ConnectingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShellView.xaml.cs">
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StartPageView.xaml.cs">
+      <DependentUpon>StartPageView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Networking\MessageParser.csx" />
+    <None Include="Networking\RemoteProxy.csx" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="Content\*.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FodyWeavers.xml" />
+    <Content Include="GameLogic\Content\Connecting.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config" />
+    <Content Include="GameLogic\Content\Falling.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\HostFocused.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\HostUnfocused.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\Idle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\JoinFocused.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\JoinUnfocused.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\Run.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="GameLogic\Content\WaitingForConnection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Page Include="Views\ConnectingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StartPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets" Condition="Exists('..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets')" />
+  <Import Project="..\packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets" Condition="Exists('..\packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MonoGame.Framework.WindowsDX.3.7.1.189\build\MonoGame.Framework.WindowsDX.targets'))" />
     <Error Condition="!Exists('..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.4.0.0-beta.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.4.0.0-beta.1\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\PropertyChanged.Fody.2.6.0\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PropertyChanged.Fody.2.6.0\build\PropertyChanged.Fody.props'))" />
   </Target>
+  <Import Project="..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets" Condition="Exists('..\packages\Scripty.MsBuild.0.7.4\build\Scripty.MsBuild.targets')" />
+  <Import Project="..\packages\Fody.4.0.0-beta.1\build\Fody.targets" Condition="Exists('..\packages\Fody.4.0.0-beta.1\build\Fody.targets')" />
 </Project>

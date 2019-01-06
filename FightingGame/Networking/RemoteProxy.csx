@@ -11,7 +11,7 @@ var root = (CompilationUnitSyntax)tree.GetRoot();
 var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
 Output.Write(@"//Generated code. Manual changes will be clobbered
-using FightingGame.Systems;
+using FightingGame.GameLogic;
 using Lidgren.Network;
 using System.Threading.Tasks;
 
@@ -19,10 +19,10 @@ namespace FightingGame.Networking
 {
     public class RemoteProxy
     {        
-        NetworkManager _networkManager;
+        NetworkManagerBase _networkManager;
         NetConnection _networkConnection;
 
-        public RemoteProxy(NetworkManager networkManager, NetConnection networkConnection)
+        public RemoteProxy(NetworkManagerBase networkManager, NetConnection networkConnection)
         {
             _networkManager = networkManager;
             _networkConnection = networkConnection;

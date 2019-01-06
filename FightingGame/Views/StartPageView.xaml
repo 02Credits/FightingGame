@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="FightingGame.Views.StartPageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FightingGame.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button x:Name="Host" Margin="25" Grid.Column="0" Grid.RowSpan="2" FontSize="40">Host</Button>
+        <StackPanel Grid.Column="1" Margin="25">
+            <Label>Host Address</Label>
+            <TextBox x:Name="HostAddress"></TextBox>
+        </StackPanel>
+        <Button x:Name="Join" Margin="25" Grid.Column="1" Grid.Row="1" FontSize="40" IsEnabled="{Binding CanJoin}">Join</Button>
+    </Grid>
+</UserControl>

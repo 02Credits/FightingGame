@@ -11,7 +11,7 @@ var root = (CompilationUnitSyntax)tree.GetRoot();
 var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
 Output.Write(@"//Generated code. Manual changes will be clobbered
-using FightingGame.Systems;
+using FightingGame.GameLogic;
 using Lidgren.Network;
 using System;
 using System.Collections.Generic;
@@ -20,12 +20,14 @@ namespace FightingGame.Networking
 {
     public class MessageParser
     {
-        private NetworkManager _networkManager;
+        private NetworkManagerBase _networkManager;
+        private Methods _methods;
         private Dictionary<string, Func<NetIncomingMessage, byte[]>> _parsers;
 
-        public MessageParser(NetworkManager networkManager)
+        public MessageParser(NetworkManagerBase networkManager, Methods methods)
         {
             _networkManager = networkManager;
+            _methods = methods;
             _parsers = new Dictionary<string, Func<NetIncomingMessage, byte[]>>();
             PopulateParsers();
         }
@@ -84,7 +86,7 @@ foreach (var method in methods)
     if (lambdaParameters.Any()) lambdaParametersString = string.Join(", ", lambdaParameters);
 
     Output.Write($@"
-                {lambdaType} methodExecutor = ({lambdaTypesString}) => Methods.{method.Identifier}({lambdaParametersString});
+                {lambdaType} methodExecutor = ({lambdaTypesString}) => _methods.{method.Identifier}({lambdaParametersString});
                 return _networkManager.ExecuteMethodFromMessage(lidgrenMessage, methodExecutor);
             }};");
 }

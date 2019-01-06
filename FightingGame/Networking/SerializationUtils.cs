@@ -12,7 +12,7 @@ namespace FightingGame.Networking
         {
             Console.WriteLine("Saving to " + fileName);
             var path = Path.GetDirectoryName(fileName);
-            if (!Directory.Exists(path) && !String.IsNullOrWhiteSpace(path))
+            if (!Directory.Exists(path) && !string.IsNullOrWhiteSpace(path))
                 Directory.CreateDirectory(path);
             using (var stream = File.OpenWrite(fileName))
             using (var streamWriter = new StreamWriter(stream))

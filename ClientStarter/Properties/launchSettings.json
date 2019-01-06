@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ClientStarter": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "FightingGame.dll -c",
+      "workingDirectory": "C:\\dev\\Projects\\FightingGame\\FightingGame\\bin\\Debug\\netcoreapp2.0"
+    }
+  }
+}

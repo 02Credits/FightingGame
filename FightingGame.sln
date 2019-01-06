@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FightingGame", "FightingGame\FightingGame.csproj", "{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientStarter", "ClientStarter\ClientStarter.csproj", "{821E0240-372E-450B-BFF2-D4E85CF560B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FightingGame", "FightingGame\FightingGame.csproj", "{94364736-CA05-4216-930D-BDD790EB1B7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,23 +17,38 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|x64.Build.0 = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Debug|x86.Build.0 = Debug|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|x64.ActiveCfg = Release|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|x64.Build.0 = Release|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|x86.ActiveCfg = Release|Any CPU
-		{C928DDD0-32B7-4A89-89F0-2EC4949E3CBA}.Release|x86.Build.0 = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|x64.Build.0 = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Debug|x86.Build.0 = Debug|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|x64.ActiveCfg = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|x64.Build.0 = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|x86.ActiveCfg = Release|Any CPU
+		{821E0240-372E-450B-BFF2-D4E85CF560B2}.Release|x86.Build.0 = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Debug|x86.Build.0 = Debug|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|x64.Build.0 = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{94364736-CA05-4216-930D-BDD790EB1B7E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B18B3114-C95B-4D5E-9716-3E39E3F8E2DD}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

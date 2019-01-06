@@ -1,5 +1,5 @@
 //Generated code. Manual changes will be clobbered
-using FightingGame.Systems;
+using FightingGame.GameLogic;
 using Lidgren.Network;
 using System.Threading.Tasks;
 
@@ -7,18 +7,18 @@ namespace FightingGame.Networking
 {
     public class RemoteProxy
     {        
-        NetworkManager _networkManager;
+        NetworkManagerBase _networkManager;
         NetConnection _networkConnection;
 
-        public RemoteProxy(NetworkManager networkManager, NetConnection networkConnection)
+        public RemoteProxy(NetworkManagerBase networkManager, NetConnection networkConnection)
         {
             _networkManager = networkManager;
             _networkConnection = networkConnection;
         }
 
-        public Task<object> NewInput(string playerId, int inputFrame, InputState inputState)
+        public Task<object> NewInput(InputState inputState)
         {
-            return _networkManager.SendCommand<object, string, int, InputState>(_networkConnection, "NewInput", playerId, inputFrame, inputState);
+            return _networkManager.SendCommand<object, InputState>(_networkConnection, "NewInput", inputState);
         }
     }
 }

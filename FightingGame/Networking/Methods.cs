@@ -1,6 +1,6 @@
-﻿using FightingGame.Systems;
+﻿using FightingGame.GameLogic;
+using FightingGame.GameLogic.Systems;
 using Microsoft.Xna.Framework;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +8,16 @@ using System.Text;
 
 namespace FightingGame.Networking
 {
-    public static class Methods
+    public class Methods
     {
-        public static void NewInput(string playerId, int inputFrame, InputState inputState)
+        private RemoteInputsManager _remoteInputsManager;
+
+        public Methods(RemoteInputsManager remoteInputsManager)
         {
-            Log.Information("Recieved Input {frameNumber}", inputFrame);
-            Game.GetSystem<InputManager>().RecievedStates.Enqueue((playerId, inputFrame, inputState));
+            _remoteInputsManager = remoteInputsManager;
         }
+
+        public void NewInput(InputState inputState)
+            => _remoteInputsManager.RecievedStates.Enqueue(inputState);
     }
 }
