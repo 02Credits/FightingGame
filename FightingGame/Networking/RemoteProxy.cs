@@ -1,7 +1,7 @@
 //Generated code. Manual changes will be clobbered
-using FightingGame.GameLogic;
 using Lidgren.Network;
 using System.Threading.Tasks;
+using FightingGame.ViewModels;
 
 namespace FightingGame.Networking
 {
@@ -14,6 +14,16 @@ namespace FightingGame.Networking
         {
             _networkManager = networkManager;
             _networkConnection = networkConnection;
+        }
+
+        public Task<object> Message(MessageViewModel message)
+        {
+            return _networkManager.SendCommand<object, MessageViewModel>(_networkConnection, "Message", message);
+        }
+
+        public Task<object> StartInTen()
+        {
+            return _networkManager.SendCommand<object>(_networkConnection, "StartInTen");
         }
 
         public Task<object> NewInput(InputState inputState)

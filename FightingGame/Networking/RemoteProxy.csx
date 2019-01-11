@@ -11,9 +11,9 @@ var root = (CompilationUnitSyntax)tree.GetRoot();
 var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
 Output.Write(@"//Generated code. Manual changes will be clobbered
-using FightingGame.GameLogic;
 using Lidgren.Network;
 using System.Threading.Tasks;
+using FightingGame.ViewModels;
 
 namespace FightingGame.Networking
 {
@@ -50,9 +50,13 @@ foreach (var method in methods)
     var sendParameters = new List<string>();
     foreach (var param in methodParameters)
     {
+        var paramType = param.Type.ToString();
+        var paramIdentifier = param.Identifier.ToString();
+        if (paramType == "RemoteProxy" || (paramType == "double" && paramIdentifier == "sendTime")) continue;
+
         parameters.Add(param.ToString());
-        typeParameters.Add(param.Type.ToString());
-        sendParameters.Add(param.Identifier.ToString());
+        typeParameters.Add(paramType);
+        sendParameters.Add(paramIdentifier);
     }
 
     var typeParameterText = "";

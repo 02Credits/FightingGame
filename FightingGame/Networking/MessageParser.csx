@@ -11,10 +11,10 @@ var root = (CompilationUnitSyntax)tree.GetRoot();
 var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
 Output.Write(@"//Generated code. Manual changes will be clobbered
-using FightingGame.GameLogic;
 using Lidgren.Network;
 using System;
 using System.Collections.Generic;
+using FightingGame.ViewModels;
 
 namespace FightingGame.Networking
 {
@@ -45,16 +45,22 @@ foreach (var method in methods)
     var parameters = method.ParameterList.Parameters;
     Output.Write($@"
             _parsers[""{method.Identifier.ToString()}""] = (lidgrenMessage) =>
-            {{");
+            {{
+                var timeSent = lidgrenMessage.ReadTime(false);");
     var lambdaTypes = new List<string>();
     var lambdaParameters = new List<string>();
     var types = new List<string>();
+
     foreach (var param in parameters)
     {
         var paramType = param.Type.ToString();
         if (paramType == "RemoteProxy")
         {
             lambdaParameters.Add("_networkManager.Proxies[lidgrenMessage.SenderConnection]");
+        }
+        else if (paramType == "double" && param.Identifier.ToString() == "sendTime")
+        {
+            lambdaParameters.Add("timeSent");
         }
         else
         {

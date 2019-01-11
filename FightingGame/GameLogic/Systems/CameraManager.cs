@@ -1,4 +1,5 @@
 ﻿using FightingGame.GameLogic.Systems.Interfaces;
+using FightingGame.ViewModels;
 using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace FightingGame.GameLogic.Systems
 
     public class CameraManager : SystemBase, ILoadableSystem, IUpdatableSystem
     {
+        public const float ASPECT_RATIO = 2.0f;
         public const float CAMERA_WIDTH = 600;
         public const float CAMERA_MOVEMENT_SPEED = 0.1f;
 
@@ -21,7 +23,7 @@ namespace FightingGame.GameLogic.Systems
         {
             Projection = Matrix.CreateOrthographic(
                 CAMERA_WIDTH,
-                CAMERA_WIDTH / Game.ASPECT_RATIO,
+                CAMERA_WIDTH / ASPECT_RATIO,
                 0,
                 10);
         }

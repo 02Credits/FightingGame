@@ -3,39 +3,40 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Autofac;
 using System.Reflection;
-using FightingGame.Networking;
 using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
+using FightingGame.GameLogic;
 using FightingGame.GameLogic.Systems.Interfaces;
 
 namespace FightingGame.GameLogic
 {
     public class Game : WpfGame
     {
-        public const float ASPECT_RATIO = 2.0f;
-
-        private IContainer _container;
+        private ILifetimeScope _parentScope;
         private ILifetimeScope _gameScope;
 
+        private WpfGraphicsDeviceService _graphicsDeviceManager;
         private SystemManager _systemManager;
         private BasicEffect _basicEffect;
         private WpfKeyboard _keyboard;
         private WpfMouse _mouse;
 
-        public Game(IContainer container)
+        public Game(ILifetimeScope parentScope)
         {
-            _container = container;
+            _parentScope = parentScope;
         }
 
         protected override void Initialize()
         {
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 60.0f);
 
+            _graphicsDeviceManager = new WpfGraphicsDeviceService(this);
+
             _basicEffect = new BasicEffect(GraphicsDevice);
             _keyboard = new WpfKeyboard(this);
             _mouse = new WpfMouse(this);
 
-            _gameScope = _container.BeginLifetimeScope(gameScopeBuilder =>
+            _gameScope = _parentScope.BeginLifetimeScope(gameScopeBuilder =>
             {
                 var assembly = Assembly.GetExecutingAssembly();
                 gameScopeBuilder.RegisterAssemblyTypes(assembly)

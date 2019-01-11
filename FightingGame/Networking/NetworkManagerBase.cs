@@ -10,22 +10,6 @@ namespace FightingGame.Networking
 {
     public class NetworkManagerBase
     {
-        internal class NonAckedMessage
-        {
-            public DateTime LastAckSendTime { get; set; }
-            public DateTime OriginalSendTime { get; }
-            public NetConnection RemoteConnection { get; }
-            public NetOutgoingMessage OutgoingMessage { get; }
-
-            public NonAckedMessage(DateTime lastAckSendTime, DateTime originalSendTime, NetConnection remoteConnection, NetOutgoingMessage outgoingMessage)
-            {
-                LastAckSendTime = lastAckSendTime;
-                OriginalSendTime = originalSendTime;
-                RemoteConnection = remoteConnection;
-                OutgoingMessage = outgoingMessage;
-            }
-        }
-
         public NetPeer LidgrenPeer { get; private set; }
 
         public HashSet<RemoteProxy> ConnectedClients { get; private set; }
@@ -34,13 +18,9 @@ namespace FightingGame.Networking
 
         private Dictionary<NetConnection, RemoteProxy> _proxyLookup = new Dictionary<NetConnection, RemoteProxy>();
 
-        private IDManager _ackIDManager = new IDManager();
         private IDManager _convoIDManager = new IDManager();
 
-        private Dictionary<long, NonAckedMessage> _nonAckedMessages = new Dictionary<long, NonAckedMessage>();
         private Dictionary<long, Action<NetIncomingMessage>> _callbackActions = new Dictionary<long, Action<NetIncomingMessage>>();
-
-        private Dictionary<NetConnection, List<long>> _seenAckIDs = new Dictionary<NetConnection, List<long>>();
         private Dictionary<long, Action<NetIncomingMessage>> _responseSubscriptions = new Dictionary<long, Action<NetIncomingMessage>>();
 
         private SendOrPostCallback _messageReadyCallback;
@@ -50,8 +30,9 @@ namespace FightingGame.Networking
         public NetworkManagerBase(Methods methods)
         {
             Methods = methods;
-            _messageParser = new MessageParser(this, Methods);
             ConnectedClients = new HashSet<RemoteProxy>();
+            _messageReadyCallback = new SendOrPostCallback(MessageReady);
+            _messageParser = new MessageParser(this, Methods);
         }
 
        public virtual void ConnectionConnected(RemoteProxy proxy) { }
@@ -66,8 +47,8 @@ namespace FightingGame.Networking
         public void Start(NetPeerConfiguration config)
         {
             LidgrenPeer = new NetPeer(config);
-            LidgrenPeer.Start();
             LidgrenPeer.RegisterReceivedCallback(_messageReadyCallback);
+            LidgrenPeer.Start();
         }
 
         public virtual void MessageReady(object _)
@@ -78,8 +59,7 @@ namespace FightingGame.Networking
                 switch (msg.MessageType)
                 {
                     case NetIncomingMessageType.Data:
-                        var ackID = msg.ReadInt64();
-                        ParseOrHandleAck(msg, ackID);
+                        Parse(msg);
                         break;
 
                     case NetIncomingMessageType.StatusChanged:
@@ -101,35 +81,7 @@ namespace FightingGame.Networking
             }
         }
 
-        private void ResendMessages()
-        {
-            foreach (var id in _nonAckedMessages.Keys.ToList())
-            {
-                var nonAckedMessage = _nonAckedMessages[id];
-
-                if ((DateTime.Now - nonAckedMessage.OriginalSendTime).TotalSeconds > 10)
-                {
-                    nonAckedMessage.RemoteConnection.Disconnect("No response for too long...");
-                }
-
-                if ((DateTime.Now - nonAckedMessage.LastAckSendTime).TotalSeconds > 0.1)
-                {
-                    if (nonAckedMessage.OutgoingMessage.LengthBits != 0)
-                    {
-                        var ackMessage = LidgrenPeer.CreateMessage();
-                        ackMessage.Write(nonAckedMessage.OutgoingMessage.PeekDataBuffer());
-                        LidgrenPeer.SendMessage(ackMessage, nonAckedMessage.RemoteConnection, NetDeliveryMethod.Unreliable);
-                        nonAckedMessage.LastAckSendTime = DateTime.Now;
-                    }
-                    else
-                    {
-                        _nonAckedMessages.Remove(id);
-                    }
-                }
-            }
-        }
-
-       private void HandleStatusChange(NetIncomingMessage msg)
+        private void HandleStatusChange(NetIncomingMessage msg)
         {
             var status = (NetConnectionStatus)msg.ReadByte();
 
@@ -153,53 +105,25 @@ namespace FightingGame.Networking
             }
         }
 
-        private void ParseOrHandleAck(NetIncomingMessage msg, long ackID)
+        private void Parse(NetIncomingMessage msg)
         {
             var command = msg.ReadString();
-            if (command == "ack")
+
+            var convoID = msg.ReadInt64();
+            if (command == "response")
             {
-                _nonAckedMessages.Remove(ackID);
+                _responseSubscriptions[convoID](msg);
             }
             else
             {
-                var ackMessage = LidgrenPeer.CreateMessage();
-                ackMessage.Write(ackID);
-                ackMessage.Write("ack");
-                LidgrenPeer.SendMessage(ackMessage, msg.SenderConnection, NetDeliveryMethod.Unreliable);
-                if (!_seenAckIDs.ContainsKey(msg.SenderConnection))
-                {
-                    _seenAckIDs[msg.SenderConnection] = new List<long>();
-                }
-
-                if (!_seenAckIDs[msg.SenderConnection].Contains(ackID))
-                {
-                    _seenAckIDs[msg.SenderConnection].Add(ackID);
-                    var convoID = msg.ReadInt64();
-                    if (command == "response")
-                    {
-                        _responseSubscriptions[convoID](msg);
-                    }
-                    else
-                    {
-                        var data = ParseMessage(command, msg);
-                        var responseMessage = GetAckedMessage(msg.SenderConnection);
-                        responseMessage.Write("response");
-                        responseMessage.Write(convoID);
-                        responseMessage.Write(data.Length);
-                        responseMessage.Write(data);
-                        LidgrenPeer.SendMessage(responseMessage, msg.SenderConnection, NetDeliveryMethod.Unreliable);
-                    }
-                }
+                var data = ParseMessage(command, msg);
+                var responseMessage = LidgrenPeer.CreateMessage();
+                responseMessage.Write("response");
+                responseMessage.Write(convoID);
+                responseMessage.Write(data.Length);
+                responseMessage.Write(data);
+                LidgrenPeer.SendMessage(responseMessage, msg.SenderConnection, NetDeliveryMethod.ReliableUnordered);
             }
-        }
-
-        public NetOutgoingMessage GetAckedMessage(NetConnection target)
-        {
-            var msg = LidgrenPeer.CreateMessage();
-            var ackID = _ackIDManager.GetNextID();
-            msg.Write(ackID);
-            _nonAckedMessages[ackID] = new NonAckedMessage(DateTime.Now, DateTime.Now, target, msg);
-            return msg;
         }
 
         public Task<R> SubscribeToResponse<R>(long conversationID)
@@ -229,7 +153,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R>(NetConnection connection, string commandName)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -242,7 +166,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R, T1>(NetConnection connection, string commandName, T1 param1)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName, param1);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -255,7 +179,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R, T1, T2>(NetConnection connection, string commandName, T1 param1, T2 param2)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName, param1, param2);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -268,7 +192,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R, T1, T2, T3>(NetConnection connection, string commandName, T1 param1, T2 param2, T3 param3)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName, param1, param2, param3);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -281,7 +205,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R, T1, T2, T3, T4>(NetConnection connection, string commandName, T1 param1, T2 param2, T3 param3, T4 param4)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName, param1, param2, param3, param4);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -294,7 +218,7 @@ namespace FightingGame.Networking
 
         public Task<R> SendCommand<R, T1, T2, T3, T4, T5>(NetConnection connection, string commandName, T1 param1, T2 param2, T3 param3, T4 param4, T5 param5)
         {
-            var msg = GetAckedMessage(connection);
+            var msg = LidgrenPeer.CreateMessage();
             var id = WriteCommand(msg, commandName, param1, param2, param3, param4, param5);
             LidgrenPeer.SendMessage(msg, connection, NetDeliveryMethod.Unreliable);
             return SubscribeToResponse<R>(id);
@@ -312,6 +236,7 @@ namespace FightingGame.Networking
             msg.Write(commandName);
             var convoID = _convoIDManager.GetNextID();
             msg.Write(convoID);
+            msg.WriteTime(false);
             return convoID;
         }
 
@@ -469,7 +394,7 @@ namespace FightingGame.Networking
             return SerializationUtils.Serialize(returnVal);
         }
 
-        public void Unload()
+        public void Stop()
         {
             if (LidgrenPeer != null)
             {

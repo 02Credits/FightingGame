@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Caliburn.Micro;
+using FightingGame.GameLogic;
 using FightingGame.Networking;
 using FightingGame.ViewModels;
 using System;
@@ -29,18 +30,16 @@ namespace FightingGame
             var assembly = Assembly.GetExecutingAssembly();
 
             // register view models
-            builder.RegisterAssemblyTypes(AssemblySource.Instance.ToArray())
+            builder.RegisterAssemblyTypes(assembly)
                 // must be a type that ends with ViewModel
                 .Where(type => type.Name.EndsWith("ViewModel"))
-                // must implement INotifyPropertyChanged (deriving from PropertyChangedBase will satisfy this)
-                .Where(type => type.GetInterface(typeof(INotifyPropertyChanged).Name) != null)
                 // registered as self
                 .AsSelf()
                 // always create a new one
                 .InstancePerDependency();
 
             // register views
-            builder.RegisterAssemblyTypes(AssemblySource.Instance.ToArray())
+            builder.RegisterAssemblyTypes(assembly)
                 // must be a type that ends with View
                 .Where(type => type.Name.EndsWith("View"))
                 // registered as self
@@ -49,11 +48,16 @@ namespace FightingGame
                 .InstancePerDependency();
 
             // register the single window manager for this container
-            builder.Register<IWindowManager>(c => new WindowManager()).InstancePerLifetimeScope();
+            builder.Register<IWindowManager>(c => new CustomWindowManager()).InstancePerLifetimeScope();
             // register event aggregator
             builder.Register<IEventAggregator>(c => new EventAggregator()).InstancePerLifetimeScope();
 
             builder.RegisterType<Methods>().AsSelf().SingleInstance();
+            builder.RegisterType<RemoteInputsManager>().AsSelf().SingleInstance();
+            builder.RegisterType<NetworkManager>().AsSelf().SingleInstance();
+            builder.RegisterType<HomeViewModel>().AsSelf().SingleInstance();
+
+            builder.RegisterType<Game>().AsSelf().InstancePerDependency();
 
             _container = builder.Build();
         }
@@ -75,7 +79,17 @@ namespace FightingGame
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            DisplayRootViewFor<ShellViewModel>();
+            var settings = new Dictionary<string, object>();
+            settings["Width"] = 900;
+            settings["Height"] = 450;
+            DisplayRootViewFor<ShellViewModel>(settings);
+        }
+
+        protected override void OnExit(object sender, EventArgs e)
+        {
+            var networkManager = _container.Resolve<NetworkManager>();
+            networkManager.Stop();
+            base.OnExit(sender, e);
         }
     }
 }

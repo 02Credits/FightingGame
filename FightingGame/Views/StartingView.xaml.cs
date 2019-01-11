@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace FightingGame.Views
 {
     /// <summary>
-    /// Interaction logic for StartPageView.xaml
+    /// Interaction logic for StartingView.xaml
     /// </summary>
-    public partial class StartPageView : UserControl
+    public partial class StartingView : UserControl
     {
-        public StartPageView()
+        public StartingView()
         {
             InitializeComponent();
         }

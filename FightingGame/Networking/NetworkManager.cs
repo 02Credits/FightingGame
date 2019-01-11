@@ -1,36 +1,77 @@
-﻿using Lidgren.Network;
+﻿using Caliburn.Micro;
+using FightingGame.ViewModels;
+using Lidgren.Network;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FightingGame.Networking
 {
-    public class NetworkManager : NetworkManagerBase 
-    {
-        public NetworkManager(Methods methods) : base(methods) { }
+    public class ConnectionLostEvent : IPageChangeEvent { }
 
-        public void Connect(string host, int port)
+    public class ConnectedEvent : IPageChangeEvent
+    {
+        public bool IsHosting { get; }
+        public ConnectedEvent(bool isHosting) => IsHosting = isHosting;
+    }
+
+    public class BroadcastEvent
+    {
+        public Func<RemoteProxy, Task> Execute { get; }
+        public BroadcastEvent(Func<RemoteProxy, Task> execute) => Execute = execute;
+    }
+
+    public class NetworkManager : NetworkManagerBase, IHandle<BroadcastEvent> 
+    {
+        public const int PORT = 8080;
+
+        IEventAggregator _eventAggregator;
+
+        public bool Hosting { get; private set; }
+
+        public NetworkManager(Methods methods, IEventAggregator eventAggregator) 
+            : base(methods)
+        {
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.SubscribeOnUIThread(this);
+        }
+
+        public void Connect(string host)
         {
             var config = new NetPeerConfiguration("fighting-game");
-            if (host.ToLower() == "localhost") host = "127.0.0.1";
             Start(config);
-            LidgrenPeer.Connect(host, port);
+            if (host.ToLower() == "localhost") host = "127.0.0.1";
+            LidgrenPeer.Connect(host, PORT);
+            Hosting = false;
         }
 
         public void Host()
         {
             var config = new NetPeerConfiguration("fighting-game");
-            config.Port = 8080;
+            config.Port = PORT;
             config.AcceptIncomingConnections = true;
             Start(config);
+            Hosting = true;
         }
 
-        public override void ConnectionConnected(RemoteProxy proxy)
+        public async override void ConnectionConnected(RemoteProxy proxy)
         {
-            Console.WriteLine("Somebody connected. Do something.");
+            await _eventAggregator.PublishOnCurrentThreadAsync(new ConnectedEvent(Hosting));
         }
 
-        public override void ConnectionDisconnected()
+        public async override void ConnectionDisconnected()
         {
-            Console.WriteLine("Stop game. Somebody disconnected...");
+            await _eventAggregator.PublishOnCurrentThreadAsync(new ConnectionLostEvent());
+            LidgrenPeer.Shutdown("Connection lost...");
+        }
+
+        public async Task HandleAsync(BroadcastEvent message, CancellationToken cancellationToken)
+        {
+            foreach (RemoteProxy remote in ConnectedClients)
+            {
+                await message.Execute(remote);
+            }
         }
     }
 }
