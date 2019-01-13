@@ -123,17 +123,14 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CustomWindowManager.cs" />
-    <Compile Include="Networking\IDManager.cs" />
     <Compile Include="Networking\MessageParser.cs">
       <DependentUpon>MessageParser.csx</DependentUpon>
     </Compile>
     <Compile Include="Networking\Methods.cs" />
-    <Compile Include="Networking\NetworkManagerBase.cs" />
     <Compile Include="Networking\RemoteInputsManager.cs" />
     <Compile Include="Networking\RemoteProxy.cs">
       <DependentUpon>RemoteProxy.csx</DependentUpon>
     </Compile>
-    <Compile Include="Networking\SerializationUtils.cs" />
     <Compile Include="GameLogic\SystemManager.cs" />
     <Compile Include="GameLogic\Systems\AnimationManager.cs" />
     <Compile Include="GameLogic\Systems\CameraManager.cs" />
@@ -258,7 +255,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Networking\Networking.csproj">
+      <Project>{4ab7f1da-73e6-442d-8580-8c7fe3b34278}</Project>
+      <Name>Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{e853dff0-6127-431a-9c91-96d24d57e434}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Page Include="Views\GameView.xaml">
       <SubType>Designer</SubType>

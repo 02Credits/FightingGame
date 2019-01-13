@@ -13,20 +13,15 @@ var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 Output.Write(@"//Generated code. Manual changes will be clobbered
 using Lidgren.Network;
 using System.Threading.Tasks;
+using Networking;
 using FightingGame.ViewModels;
 
 namespace FightingGame.Networking
 {
-    public class RemoteProxy
+    public class RemoteProxy : RemoteProxyBase
     {        
-        NetworkManagerBase _networkManager;
-        NetConnection _networkConnection;
-
-        public RemoteProxy(NetworkManagerBase networkManager, NetConnection networkConnection)
-        {
-            _networkManager = networkManager;
-            _networkConnection = networkConnection;
-        }
+        public RemoteProxy(NetPeer peer, NetConnection networkConnection)
+            : base(peer, networkConnection) { }
 ");
 
 bool first = true;
@@ -70,7 +65,7 @@ foreach (var method in methods)
     Output.Write($@"
         public {returnTypeText} {method.Identifier.ToString()}({string.Join(", ", parameters)})
         {{
-            return _networkManager.SendCommand{typeParameterText}(_networkConnection, ""{method.Identifier.ToString()}""{sendParameterText});
+            return SendCommand{typeParameterText}(""{method.Identifier.ToString()}""{sendParameterText});
         }}");
 }
 

@@ -1,34 +1,29 @@
 //Generated code. Manual changes will be clobbered
 using Lidgren.Network;
 using System.Threading.Tasks;
+using Networking;
 using FightingGame.ViewModels;
 
 namespace FightingGame.Networking
 {
-    public class RemoteProxy
+    public class RemoteProxy : RemoteProxyBase
     {        
-        NetworkManagerBase _networkManager;
-        NetConnection _networkConnection;
-
-        public RemoteProxy(NetworkManagerBase networkManager, NetConnection networkConnection)
-        {
-            _networkManager = networkManager;
-            _networkConnection = networkConnection;
-        }
+        public RemoteProxy(NetPeer peer, NetConnection networkConnection)
+            : base(peer, networkConnection) { }
 
         public Task<object> Message(MessageViewModel message)
         {
-            return _networkManager.SendCommand<object, MessageViewModel>(_networkConnection, "Message", message);
+            return SendCommand<object, MessageViewModel>("Message", message);
         }
 
         public Task<object> StartInTen()
         {
-            return _networkManager.SendCommand<object>(_networkConnection, "StartInTen");
+            return SendCommand<object>("StartInTen");
         }
 
         public Task<object> NewInput(InputState inputState)
         {
-            return _networkManager.SendCommand<object, InputState>(_networkConnection, "NewInput", inputState);
+            return SendCommand<object, InputState>("NewInput", inputState);
         }
     }
 }

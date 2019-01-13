@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace FightingGame.Networking
+namespace Networking
 {
     public static class SerializationUtils
     {

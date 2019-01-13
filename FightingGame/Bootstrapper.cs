@@ -54,6 +54,8 @@ namespace FightingGame
 
             builder.RegisterType<Methods>().AsSelf().SingleInstance();
             builder.RegisterType<RemoteInputsManager>().AsSelf().SingleInstance();
+            builder.RegisterType<MessageParser>().AsSelf().SingleInstance();
+            builder.RegisterType<RemoteProxy>().AsSelf().InstancePerDependency();
             builder.RegisterType<NetworkManager>().AsSelf().SingleInstance();
             builder.RegisterType<HomeViewModel>().AsSelf().SingleInstance();
 

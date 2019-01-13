@@ -5,46 +5,48 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Microsoft.CodeAnalysis.CSharp;
 
 var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(Path.Combine(ProjectFilePath, "..", "Networking", "Methods.cs")));
 var root = (CompilationUnitSyntax)tree.GetRoot();
 var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
-Output.Write(@"//Generated code. Manual changes will be clobbered
+const string PROXY_TYPE = "RemoteProxy";
+
+Output.Write($@"//Generated code. Manual changes will be clobbered
 using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using FightingGame.ViewModels;
+using Networking;
 
 namespace FightingGame.Networking
-{
-    public class MessageParser
-    {
-        private NetworkManagerBase _networkManager;
+{{
+    public class MessageParser : MessageParserBase<{PROXY_TYPE}>
+    {{
         private Methods _methods;
-        private Dictionary<string, Func<NetIncomingMessage, byte[]>> _parsers;
+        private Dictionary<string, Func<NetIncomingMessage, {PROXY_TYPE}, byte[]>> _parsers;
 
-        public MessageParser(NetworkManagerBase networkManager, Methods methods)
-        {
-            _networkManager = networkManager;
+        public MessageParser(Methods methods)
+        {{
             _methods = methods;
-            _parsers = new Dictionary<string, Func<NetIncomingMessage, byte[]>>();
+            _parsers = new Dictionary<string, Func<NetIncomingMessage, {PROXY_TYPE}, byte[]>>();
             PopulateParsers();
-        }
+        }}
 
-        public byte[] ParseMessage(string command, NetIncomingMessage msg)
-        {
-            return _parsers[command](msg);
-        }
+        public override byte[] ParseMessage(string command, NetIncomingMessage msg, {PROXY_TYPE} proxy)
+        {{
+            return _parsers[command](msg, proxy);
+        }}
 
         private void PopulateParsers()
-        {");
+        {{");
 
 foreach (var method in methods)
 {
     var parameters = method.ParameterList.Parameters;
     Output.Write($@"
-            _parsers[""{method.Identifier.ToString()}""] = (lidgrenMessage) =>
+            _parsers[""{method.Identifier.ToString()}""] = (lidgrenMessage, proxy) =>
             {{
                 var timeSent = lidgrenMessage.ReadTime(false);");
     var lambdaTypes = new List<string>();
@@ -54,9 +56,9 @@ foreach (var method in methods)
     foreach (var param in parameters)
     {
         var paramType = param.Type.ToString();
-        if (paramType == "RemoteProxy")
+        if (paramType == PROXY_TYPE)
         {
-            lambdaParameters.Add("_networkManager.Proxies[lidgrenMessage.SenderConnection]");
+            lambdaParameters.Add("proxy");
         }
         else if (paramType == "double" && param.Identifier.ToString() == "sendTime")
         {
@@ -93,7 +95,7 @@ foreach (var method in methods)
 
     Output.Write($@"
                 {lambdaType} methodExecutor = ({lambdaTypesString}) => _methods.{method.Identifier}({lambdaParametersString});
-                return _networkManager.ExecuteMethodFromMessage(lidgrenMessage, methodExecutor);
+                return ExecuteMethodFromMessage(lidgrenMessage, methodExecutor);
             }};");
 }
 

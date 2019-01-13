@@ -1,6 +1,7 @@
 ﻿using Caliburn.Micro;
 using FightingGame.ViewModels;
 using Lidgren.Network;
+using Networking;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace FightingGame.Networking
         public BroadcastEvent(Func<RemoteProxy, Task> execute) => Execute = execute;
     }
 
-    public class NetworkManager : NetworkManagerBase, IHandle<BroadcastEvent> 
+    public class NetworkManager : NetworkManagerBase<RemoteProxy, MessageParser>, IHandle<BroadcastEvent> 
     {
         public const int PORT = 8080;
 
@@ -29,8 +30,8 @@ namespace FightingGame.Networking
 
         public bool Hosting { get; private set; }
 
-        public NetworkManager(Methods methods, IEventAggregator eventAggregator) 
-            : base(methods)
+        public NetworkManager(Methods methods, IEventAggregator eventAggregator, MessageParser messageParser, Func<NetPeer, NetConnection, RemoteProxy> proxyFactory) 
+            : base(messageParser, proxyFactory)
         {
             _eventAggregator = eventAggregator;
 
